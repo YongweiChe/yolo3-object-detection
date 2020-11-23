@@ -6,18 +6,17 @@ import script
 
 yolo_image = 'detected-object.jpg'
 image_path = "./yolo_image/"
-mq_sensor_key = 'sensorQ'
-mq_web_key = 'webQ'
-mq_server_name = 'mq_server.yw.com'
-mq_server_port = '5672'
 yolo_config = 'yolov3.cfg'
 yolo_weights = 'yolov3.weights'
 yolo_label = 'yolov3.label'
 yolo_objects = ["cat"]
 
+mq_sensor_key = 'sensorQ'
+mq_web_key = 'webQ'
+mq_server_name = 'mq_server.yw.com'
+mq_server_port = '5672'
 default_username = 'test'   # CHANGE me or use key
 default_password = 'test'   # CHANGE me or use key
-
 credentials = pika.PlainCredentials(username=default_username, password=default_password)
 connection = pika.BlockingConnection(
              pika.ConnectionParameters(host=mq_server_name, credentials=credentials))
@@ -29,7 +28,7 @@ def callback(ch, method, properties, body):
   content = y["content"]
   if(y["name"].find('.jpg') != -1):
     content = base64.b64decode(content)
-    image_name = image_path + y["name"]
+    image_name = y["name"]
     f = open(image_name, "bw")
     f.write(content)
     f.close()
