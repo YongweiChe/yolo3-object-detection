@@ -4,8 +4,6 @@ import json
 import base64
 
 image_location = "/var/www/html/image/"
-device_mac_address_store = "/usr/lib/cgi-bin/mac_address"       # convert to dabase
-
 mq_web_key = 'webQ'
 mq_server_name = 'mq_server.yw.com'
 mq_server_port = '5672'
@@ -27,9 +25,6 @@ def callback(ch, method, properties, body):
 	f.write(content)
 	f.close()
 
-	f = open(device_mac_address_store, "w")
-	f.write(y["mac"])
-	f.close()
 	print("Received file from:  %r" % method.routing_key)
 
 channel.basic_consume(
