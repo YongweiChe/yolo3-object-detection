@@ -7,6 +7,7 @@ import glob
 html_location = "/var/www/html/"
 image_folder = "image/"
 image_location = html_location + image_folder
+image_retention_max = 3
 mq_web_key = 'webQ'
 mq_server_name = 'mq_server.yw.com'
 mq_server_port = '5672'
@@ -19,23 +20,33 @@ channel = connection.channel()
 channel.queue_declare(queue=mq_web_key)
 
 #
+# writes html for image.html and sends it over to the web server
+#
+def update_image_html(image_name):
+    html_code = '<html> <p style = "font-size: 100%">Most recent image: ' + image_name[5:15] +' at ' + image_name[-9:-4] + '</p> <img src = ' + image_folder + image_name + ' alt = "image" style = "width:500px"></html>'
+	
+    f = open(html_location + "image.html", "w")
+    f.write(html_code)
+    print("html_code = %r" % html_code)
+    f.close()
+
+#
 # writes html for links.html and sends it over to the web server
 #
-
-def update_past_images(html_location, image_location):
+def update_past_images(html_location):
         html_file = html_location + "links.html"
         f = open(html_file, "w")
         f.write('<html>')
         counter = 0
         for image in sorted(glob.glob(image_location + '*'), reverse = True):
-                #f.write('<a href = "' + image[9:] + '">Photo taken on ' + image[20:30] +' at ' + image[-9:-4] + '</a> <p> </p>')
                 prefix_len = len(html_location)
                 f.write('<a href = "' + image[prefix_len:] + '">' + image[prefix_len:] + '</a> <p> </p>')
                 counter += 1
-                if counter == 5:
+                if counter >= image_retention_max:
                         break
         f.write('</html>')
         f.close()
+
 
 def callback(ch, method, properties, body):
 	y = json.loads(body)
@@ -49,7 +60,9 @@ def callback(ch, method, properties, body):
 
 	print("Received file from:  %r" % method.routing_key)
 
-	update_past_images(html_location, image_location)
+	update_past_images(html_location)
+	print("image name = %r" % y["name"])
+	update_image_html(y["name"])
 
 # main
 channel.basic_consume(
