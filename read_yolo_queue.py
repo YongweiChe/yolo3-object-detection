@@ -24,10 +24,9 @@ channel.queue_declare(queue=mq_web_key)
 #
 def update_image_html(image_name):
     html_code = '<html> <p style = "font-size: 100%">Most recent image: ' + image_name + '</p> <img src = ' + image_folder + image_name + ' alt = "image" style = "width:500px"></html>'
-	
+    
     f = open(html_location + "image.html", "w")
     f.write(html_code)
-    print("html_code = %r" % html_code)
     f.close()
 
 #
@@ -49,20 +48,20 @@ def update_past_images(html_location):
 
 
 def callback(ch, method, properties, body):
-	y = json.loads(body)
+    y = json.loads(body)
 
-	content = y["content"]
-	if(y["name"].find('.jpg') != -1):
-		content = base64.b64decode(content)
-	f = open(image_location + y["name"], "w")
-	f.write(content)
-	f.close()
+    content = y["content"]
+    if(y["name"].find('.jpg') != -1):
+        content = base64.b64decode(content)
+    f = open(image_location + y["name"], "w")
+    f.write(content)
+    f.close()
 
-	print("Received file from:  %r" % method.routing_key)
+    print("Received file from:  %r" % method.routing_key)
 
-	update_past_images(html_location)
-	print("image name = %r" % y["name"])
-	update_image_html(y["name"])
+    update_past_images(html_location)
+    print("image name = %r" % y["name"])
+    update_image_html(y["name"])
 
 # main
 channel.basic_consume(
