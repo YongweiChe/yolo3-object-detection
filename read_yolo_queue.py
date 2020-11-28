@@ -23,7 +23,7 @@ channel.queue_declare(queue=mq_web_key)
 # writes html for image.html and sends it over to the web server
 #
 def update_image_html(image_name):
-    html_code = '<html> <p style = "font-size: 100%">Most recent image: ' + image_name[5:15] +' at ' + image_name[-9:-4] + '</p> <img src = ' + image_folder + image_name + ' alt = "image" style = "width:500px"></html>'
+    html_code = '<html> <p style = "font-size: 100%">Most recent image: ' + image_name + '</p> <img src = ' + image_folder + image_name + ' alt = "image" style = "width:500px"></html>'
 	
     f = open(html_location + "image.html", "w")
     f.write(html_code)
